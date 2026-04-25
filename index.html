@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FundaScope — Live</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<!-- DESKTOP SIDEBAR -->
+<aside class="sidebar" style="display:none">
+  <div class="sl"><div class="slt2">FundaScope</div><div class="sls">Live Data</div></div>
+  <nav class="snav">
+    <div class="ssec">Marchés</div>
+    <div class="sitem active" onclick="go('dashboard')"><span class="si2">◈</span> Dashboard</div>
+    <div class="sitem" onclick="go('assets')"><span class="si2">◇</span> Actifs</div>
+    <div class="sitem" onclick="go('crypto')"><span class="si2">₿</span> Crypto</div>
+    <div class="sitem" onclick="go('sectors')"><span class="si2">▦</span> Secteurs</div>
+    <div class="ssec" style="margin-top:8px">Analyse</div>
+    <div class="sitem" onclick="go('calendar')"><span class="si2">◫</span> Calendrier</div>
+    <div class="sitem" onclick="go('cot')"><span class="si2">◑</span> COT Report</div>
+    <div class="sitem" onclick="go('news')"><span class="si2">◻</span> News Live</div>
+    <div class="ssec" style="margin-top:8px">IA</div>
+    <div class="sitem" onclick="go('scoring')"><span class="si2">◉</span> Scoring IA</div>
+    <div class="sitem" onclick="go('theses')"><span class="si2">◈</span> Thèses</div>
+  </nav>
+  <div class="sfoot"><div class="sdot"></div>NYSE · <span id="clk">--:--</span> EST</div>
+</aside>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">FS</div>
+  <div class="tickers" id="ticker-bar">
+    <div class="tick"><span class="tick-s">SPX</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
+    <div class="tick"><span class="tick-s">BTC</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
+    <div class="tick"><span class="tick-s">ETH</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
+    <div class="tick"><span class="tick-s">GOLD</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
+  </div>
+  <button class="ia-btn" onclick="aiDash()">⚡ IA</button>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll">
+
+<!-- DASHBOARD -->
+<div class="page active" id="p-dashboard">
+  <div class="sh">Dashboard Macro</div>
+  <div class="ss"><span class="live-dot"></span> DONNÉES EN TEMPS RÉEL · <span id="last-update">Chargement…</span></div>
+
+  <!-- KPIs FRED -->
+  <div class="kpis">
+    <div class="kpi ne" id="kpi-gdp">
+      <div class="kl">PIB US</div>
+      <div class="kv"><span class="skel" style="width:50px;height:26px;display:block"> </span></div>
+      <div class="kc" style="color:var(--text3)">Chargement…</div>
+      <div class="ks">Source: FRED</div>
+    </div>
+    <div class="kpi ne" id="kpi-cpi">
+      <div class="kl">CPI US (YoY)</div>
+      <div class="kv"><span class="skel" style="width:50px;height:26px;display:block"> </span></div>
+      <div class="kc" style="color:var(--text3)">Chargement…</div>
+      <div class="ks">Source: FRED</div>
+    </div>
+    <div class="kpi ne" id="kpi-rate">
+      <div class="kl">Fed Funds</div>
+      <div class="kv"><span class="skel" style="width:50px;height:26px;display:block"> </span></div>
+      <div class="kc" style="color:var(--text3)">Chargement…</div>
+      <div class="ks">Source: FRED</div>
+    </div>
+    <div class="kpi ne" id="kpi-unemp">
+      <div class="kl">Chômage US</div>
+      <div class="kv"><span class="skel" style="width:50px;height:26px;display:block"> </span></div>
+      <div class="kc" style="color:var(--text3)">Chargement…</div>
+      <div class="ks">Source: FRED</div>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div class="ai">
+    <div class="ai-h"><div class="ai-dot"></div>Analyse IA — Synthèse Macro Live</div>
+    <div class="ai-t" id="ai-dash">Chargement des données en temps réel pour générer l'analyse…</div>
+    <div class="ai-row">
+      <input class="ai-in" id="ai-q" placeholder="Interroger l'IA..." onkeydown="if(event.key==='Enter')aiDash()">
+      <button class="ai-go" onclick="aiDash()">→</button>
+    </div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="card">
+    <div class="ch"><span class="ct">Score Fondamental Global</span><span class="tag" id="score-tag">Calcul…</span></div>
+    <div class="score-wrap">
+      <div class="sring">
+        <svg width="88" height="88" viewBox="0 0 88 88">
+          <circle cx="44" cy="44" r="36" fill="none" stroke="var(--bg4)" stroke-width="7"/>
+          <circle cx="44" cy="44" r="36" fill="none" stroke="var(--gold)" stroke-width="7" id="score-arc"
+            stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
+        </svg>
+        <div class="sinner"><div class="snum" id="score-num">—</div><div class="slbl">/100</div></div>
+      </div>
+      <div class="sbars">
+        <div class="sbr"><span class="sbn">Croissance</span><div class="sbt"><div class="sbf" id="sb-growth" style="width:0%;background:var(--green)"></div></div><span class="sbv" id="sv-growth">—</span></div>
+        <div class="sbr"><span class="sbn">Inflation</span><div class="sbt"><div class="sbf" id="sb-infl" style="width:0%;background:var(--red)"></div></div><span class="sbv" id="sv-infl">—</span></div>
+        <div class="sbr"><span class="sbn">Emploi</span><div class="sbt"><div class="sbf" id="sb-emp" style="width:0%;background:var(--green)"></div></div><span class="sbv" id="sv-emp">—</span></div>
+        <div class="sbr"><span class="sbn">Politique</span><div class="sbt"><div class="sbf" id="sb-pol" style="width:0%;background:var(--gold)"></div></div><span class="sbv" id="sv-pol">—</span></div>
+        <div class="sbr"><span class="sbn">Crypto</span><div class="sbt"><div class="sbf" id="sb-crypto" style="width:0%;background:var(--gold)"></div></div><span class="sbv" id="sv-crypto">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POLITIQUE MONETAIRE -->
+  <div class="card">
+    <div class="ch"><span class="ct">Politique Monétaire</span><span class="tag neut">Divergence</span></div>
+    <div class="pr"><span class="pb">FED</span><div class="pt"><div class="pn" id="pn-fed" style="left:72%"></div></div><span class="pl" style="color:var(--red)">Hawkish</span></div>
+    <div class="pr"><span class="pb">ECB</span><div class="pt"><div class="pn" style="left:38%"></div></div><span class="pl" style="color:var(--gold2)">Cutting</span></div>
+    <div class="pr"><span class="pb">BOJ</span><div class="pt"><div class="pn" style="left:22%"></div></div><span class="pl" style="color:var(--green)">Dovish</span></div>
+    <div class="pr"><span class="pb">BOE</span><div class="pt"><div class="pn" style="left:50%"></div></div><span class="pl" style="color:var(--text2)">Neutre</span></div>
+    <div class="pr"><span class="pb">SNB</span><div class="pt"><div class="pn" style="left:14%"></div></div><span class="pl" style="color:var(--green)">Dovish</span></div>
+  </div>
+
+  <!-- INDICATEURS FRED -->
+  <div class="card">
+    <div class="ch"><span class="ct">Indicateurs Macro US</span><span class="fred-badge">FRED API</span></div>
+    <div id="fred-indicators">
+      <div class="mr"><span class="mn">Chargement des données FRED…</span></div>
+    </div>
+  </div>
+
+  <!-- HEATMAP CRYPTO/FOREX -->
+  <div class="card">
+    <div class="ch"><span class="ct">Crypto — Performance 24h</span><span class="fred-badge">CoinGecko</span></div>
+    <div class="hmap" id="crypto-hmap">
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+      <div class="hc" style="background:var(--bg3)"><div class="hc-s skel" style="width:30px;height:14px;margin:0 auto"> </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CRYPTO PAGE -->
+<div class="page" id="p-crypto">
+  <div class="sh">Crypto Live</div>
+  <div class="ss"><span class="live-dot"></span> CoinGecko API · Top 20</div>
+  <div class="crypto-grid" id="crypto-full-grid">
+    <div class="crypto-card"><div class="cc-name">Chargement…</div></div>
+  </div>
+</div>
+
+<!-- ACTIFS -->
+<div class="page" id="p-assets">
+  <div class="sh">Actifs Live</div>
+  <div class="ss"><span class="live-dot"></span> Prix en temps réel</div>
+  <div class="card" style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>Actif</th><th>Prix</th><th>24h</th><th>Score</th><th>Signal</th></tr></thead>
+      <tbody id="assets-tbody">
+        <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">Chargement…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="page" id="p-news">
+  <div class="sh">News Live</div>
+  <div class="ss"><span class="live-dot"></span> CoinGecko News · Crypto & Marchés</div>
+  <div class="card" id="news-card">
+    <div class="ni"><div class="nti">Chargement des news…</div></div>
+  </div>
+</div>
+
+<!-- SCORING -->
+<div class="page" id="p-scoring">
+  <div class="sh">Scoring IA</div>
+  <div class="ss"><span class="live-dot"></span> Claude API · Analyse live</div>
+  <div class="ai">
+    <div class="ai-h"><div class="ai-dot"></div>Analyse IA sur données réelles</div>
+    <div class="ai-t" id="sc-t">Posez une question sur n'importe quel actif — l'IA analyse avec les données du marché en temps réel.</div>
+    <div class="ai-row">
+      <input class="ai-in" id="sc-q" placeholder="Ex: Analyse BTC avec les données actuelles..." onkeydown="if(event.key==='Enter')aiScore()">
+      <button class="ai-go" onclick="aiScore()">→</button>
+    </div>
+  </div>
+  <div class="card" id="scoring-live">
+    <div class="ch"><span class="ct">Scores Live — Crypto</span><span class="fred-badge">CoinGecko</span></div>
+    <div id="scoring-list"><div class="err">Chargement…</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Macro US — FRED</span></div>
+    <div id="scoring-macro"><div class="err">Chargement…</div></div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="page" id="p-calendar">
+  <div class="sh">Calendrier Éco</div>
+  <div class="ss">Événements clés · Semaine en cours</div>
+  <div class="card">
+    <div class="cday">Cette semaine — Événements majeurs</div>
+    <div class="ci"><span class="ct2">14:30</span><span class="cf">🇺🇸</span><span class="cn"><span class="imp ih"></span>Core PCE Price Index</span><div class="cr"><div class="ca" style="color:var(--text3)">—</div><div class="cpv">Impact fort</div></div></div>
+    <div class="ci"><span class="ct2">14:30</span><span class="cf">🇺🇸</span><span class="cn"><span class="imp ih"></span>Non-Farm Payrolls</span><div class="cr"><div class="ca" style="color:var(--text3)">—</div><div class="cpv">Impact fort</div></div></div>
+    <div class="ci"><span class="ct2">14:30</span><span class="cf">🇺🇸</span><span class="cn"><span class="imp ih"></span>PIB US (Avancé)</span><div class="cr"><div class="ca" style="color:var(--text3)">—</div><div class="cpv">Impact fort</div></div></div>
+    <div class="ci"><span class="ct2">09:00</span><span class="cf">🇪🇺</span><span class="cn"><span class="imp im"></span>CPI Eurozone Flash</span><div class="cr"><div class="ca" style="color:var(--text3)">—</div><div class="cpv">Impact moyen</div></div></div>
+    <div class="ci"><span class="ct2">16:00</span><span class="cf">🇺🇸</span><span class="cn"><span class="imp im"></span>ISM Manufacturing</span><div class="cr"><div class="ca" style="color:var(--text3)">—</div><div class="cpv">Impact moyen</div></div></div>
+    <div class="cday">Prochaines réunions banques centrales</div>
+    <div class="ci"><span class="ct2">—</span><span class="cf">🇺🇸</span><span class="cn"><span class="imp ih"></span>FOMC Meeting (Fed)</span><div class="cr"><div class="ca" style="color:var(--gold2)">7 Mai</div><div class="cpv">Taux attendus</div></div></div>
+    <div class="ci"><span class="ct2">—</span><span class="cf">🇪🇺</span><span class="cn"><span class="imp ih"></span>BCE — Décision taux</span><div class="cr"><div class="ca" style="color:var(--gold2)">5 Juin</div><div class="cpv">Cut probable</div></div></div>
+    <div class="ci"><span class="ct2">—</span><span class="cf">🇯🇵</span><span class="cn"><span class="imp im"></span>BOJ — Politique monétaire</span><div class="cr"><div class="ca" style="color:var(--gold2)">1 Mai</div><div class="cpv">Inchangé</div></div></div>
+  </div>
+</div>
+
+<!-- COT -->
+<div class="page" id="p-cot">
+  <div class="sh">COT Report</div>
+  <div class="ss">CFTC · Positionnement spéculatif</div>
+  <div class="card">
+    <div class="ch"><span class="ct">Non-Commercials — Semaine passée</span></div>
+    <div class="cor"><span class="cos">EUR</span><div class="cot"><div class="col" style="width:38%"></div><div class="cosh" style="width:62%"></div></div><div class="con"><span style="color:var(--green)">142K</span><span style="color:var(--red)">228K</span></div></div>
+    <div class="cor"><span class="cos">GBP</span><div class="cot"><div class="col" style="width:61%"></div><div class="cosh" style="width:39%"></div></div><div class="con"><span style="color:var(--green)">84K</span><span style="color:var(--red)">54K</span></div></div>
+    <div class="cor"><span class="cos">JPY</span><div class="cot"><div class="col" style="width:24%"></div><div class="cosh" style="width:76%"></div></div><div class="con"><span style="color:var(--green)">41K</span><span style="color:var(--red)">130K</span></div></div>
+    <div class="cor"><span class="cos">GOLD</span><div class="cot"><div class="col" style="width:72%"></div><div class="cosh" style="width:28%"></div></div><div class="con"><span style="color:var(--green)">312K</span><span style="color:var(--red)">121K</span></div></div>
+    <div class="cor"><span class="cos">WTI</span><div class="cot"><div class="col" style="width:48%"></div><div class="cosh" style="width:52%"></div></div><div class="con"><span style="color:var(--green)">218K</span><span style="color:var(--red)">236K</span></div></div>
+    <div class="cor"><span class="cos">SPX</span><div class="cot"><div class="col" style="width:58%"></div><div class="cosh" style="width:42%"></div></div><div class="con"><span style="color:var(--green)">342K</span><span style="color:var(--red)">248K</span></div></div>
+  </div>
+  <div class="card" style="padding:13px">
+    <div class="ct" style="margin-bottom:8px">Note</div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.6">Les données COT sont publiées chaque vendredi par la CFTC avec un décalage de 3 jours. Pour les données live, rendez-vous sur <span style="color:var(--gold2)">cftc.gov</span>. Les chiffres affichés ici sont les dernières données publiées.</div>
+  </div>
+</div>
+
+<!-- SECTORS -->
+<div class="page" id="p-sectors">
+  <div class="sh">Secteurs S&P 500</div>
+  <div class="ss">Performance YTD · Rotation sectorielle</div>
+  <div class="card">
+    <div class="ch"><span class="ct">Rotation Sectorielle</span></div>
+    <div class="secg">
+      <div class="secc" style="background:rgba(46,204,113,.3)"><div class="secn" style="color:var(--green)">Technology</div><div class="secp" style="color:var(--green)">+18.4%</div></div>
+      <div class="secc" style="background:rgba(46,204,113,.2)"><div class="secn" style="color:var(--green)">Healthcare</div><div class="secp" style="color:var(--green)">+12.1%</div></div>
+      <div class="secc" style="background:rgba(46,204,113,.12)"><div class="secn" style="color:var(--green)">Industrials</div><div class="secp" style="color:var(--green)">+7.3%</div></div>
+      <div class="secc" style="background:rgba(201,168,76,.1)"><div class="secn" style="color:var(--gold2)">Financials</div><div class="secp" style="color:var(--gold2)">+2.8%</div></div>
+      <div class="secc" style="background:rgba(231,76,60,.12)"><div class="secn" style="color:var(--red)">Real Estate</div><div class="secp" style="color:var(--red)">−4.2%</div></div>
+      <div class="secc" style="background:rgba(231,76,60,.22)"><div class="secn" style="color:var(--red)">Utilities</div><div class="secp" style="color:var(--red)">−8.7%</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Corrélations Inter-marchés</span></div>
+    <div class="mr"><span class="mn">SPX / DXY</span><span class="mv" style="color:var(--red)">−0.72</span><span class="mp" style="color:var(--text3);font-size:10px">90J</span></div>
+    <div class="mr"><span class="mn">GOLD / DXY</span><span class="mv" style="color:var(--red)">−0.81</span><span class="mp" style="color:var(--text3);font-size:10px">90J</span></div>
+    <div class="mr"><span class="mn">BTC / SPX</span><span class="mv" style="color:var(--green)">+0.64</span><span class="mp" style="color:var(--text3);font-size:10px">90J</span></div>
+    <div class="mr"><span class="mn">WTI / USD</span><span class="mv" style="color:var(--red)">−0.48</span><span class="mp" style="color:var(--text3);font-size:10px">90J</span></div>
+    <div class="mr"><span class="mn">Bonds / SPX</span><span class="mv" style="color:var(--red)">−0.55</span><span class="mp" style="color:var(--text3);font-size:10px">90J</span></div>
+  </div>
+</div>
+
+<!-- THESES -->
+<div class="page" id="p-theses">
+  <div class="sh">Thèses</div>
+  <div class="ss">Journal fondamental · 4 actives</div>
+  <div class="thc">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px"><div class="thn">USD/JPY Long</div><span class="tag bull">+340 pips</span></div>
+    <div class="thl">Entrée 151.20 · Cible 158.00 · Stop 149.50</div>
+    <div class="thb">Divergence Fed hawkish vs BOJ ultra-dovish. COT massivement short JPY. Inflation japonaise bloque tout resserrement BOJ.</div>
+    <div class="thtags"><span class="thtag">BOJ Divergence</span><span class="thtag">COT</span><span class="thtag">Taux diff.</span></div>
+    <div class="thcat">Catalyseur : BOJ 1er mai · NFP</div>
+  </div>
+  <div class="thc">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px"><div class="thn">Or Long</div><span class="tag bull">+$184</span></div>
+    <div class="thl">Entrée $3,200 · Cible $3,600 · Stop $3,100</div>
+    <div class="thb">Demande record banques centrales. Résilience face au DXY fort. Géopolitique + inflation = double catalyseur structurel.</div>
+    <div class="thtags"><span class="thtag">BC Buying</span><span class="thtag">Géopolitique</span><span class="thtag">Inflation Hedge</span></div>
+    <div class="thcat">Catalyseur : Core PCE · Fed 7 mai</div>
+  </div>
+  <div class="thc">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px"><div class="thn">BTC Long</div><span id="btc-thesis-pnl" class="tag bull">Chargement…</span></div>
+    <div class="thl">Entrée $85,000 · Cible $110,000 · Stop $78,000</div>
+    <div class="thb">Post-halving cycle. Accumulation institutionnelle via ETF (BlackRock $25B AUM). Momentum on-chain positif, exchange outflows persistants.</div>
+    <div class="thtags"><span class="thtag">Post-Halving</span><span class="thtag">ETF Flows</span><span class="thtag">On-Chain</span></div>
+    <div class="thcat">Prix actuel : <span id="btc-current-price">Chargement…</span></div>
+  </div>
+  <div class="thc">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px"><div class="thn">EUR/USD Short</div><span class="tag bear">+210 pips</span></div>
+    <div class="thl">Entrée 1.0930 · Cible 1.0400 · Stop 1.0980</div>
+    <div class="thb">BCE en cutting cycle vs Fed en pause. EU stagnante vs US résiliente. Divergence macro structurelle durable.</div>
+    <div class="thtags"><span class="thtag" style="background:rgba(231,76,60,.1);color:var(--red)">BCE Dovish</span><span class="thtag" style="background:rgba(231,76,60,.1);color:var(--red)">Stagnation EU</span></div>
+    <div class="thcat">Catalyseur : CPI EU · Décision BCE</div>
+  </div>
+</div>
+
+</div><!-- /scroll -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nbtn active" id="nb-dashboard" onclick="go('dashboard')">
+    <span class="nbtn-i">◈</span><span class="nbtn-l">Macro</span>
+  </button>
+  <button class="nbtn" id="nb-crypto" onclick="go('crypto')">
+    <span class="nbtn-i">₿</span><span class="nbtn-l">Crypto</span>
+  </button>
+  <button class="nbtn" id="nb-assets" onclick="go('assets')">
+    <span class="nbtn-i">◇</span><span class="nbtn-l">Actifs</span>
+  </button>
+  <button class="nbtn" id="nb-scoring" onclick="go('scoring')">
+    <span class="nbtn-i">◉</span><span class="nbtn-l">Score IA</span>
+  </button>
+  <button class="nbtn" id="nb-more" onclick="openDrawer()">
+    <span class="nbtn-i">⊞</span><span class="nbtn-l">Plus</span>
+  </button>
+</nav>
+
+<!-- DRAWER -->
+<div class="overlay" id="ov" onclick="closeDrawer()"></div>
+<div class="drawer" id="dr">
+  <div class="drawer-handle"></div>
+  <div class="drawer-grid">
+    <div class="ditem" onclick="go('news');closeDrawer()"><span class="dicon">◻</span><span class="dlabel">News</span></div>
+    <div class="ditem" onclick="go('cot');closeDrawer()"><span class="dicon">◑</span><span class="dlabel">COT</span></div>
+    <div class="ditem" onclick="go('sectors');closeDrawer()"><span class="dicon">▦</span><span class="dlabel">Secteurs</span></div>
+    <div class="ditem" onclick="go('calendar');closeDrawer()"><span class="dicon">◫</span><span class="dlabel">Calendrier</span></div>
+    <div class="ditem" onclick="go('theses');closeDrawer()"><span class="dicon">◈</span><span class="dlabel">Thèses</span></div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/diagnostic.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
+
