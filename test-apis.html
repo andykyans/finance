@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 FundaScope - API Test Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #ffd700; margin-bottom: 20px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card {
+            background: #1a1f3a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        .card:hover { border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .card h3 { color: #ffd700; margin-bottom: 10px; font-size: 14px; }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 8px 0;
+            font-weight: bold;
+        }
+        .ok { background: #1a3a1a; color: #4ade80; border-left: 3px solid #4ade80; }
+        .error { background: #3a1a1a; color: #f87171; border-left: 3px solid #f87171; }
+        .warning { background: #3a3a1a; color: #fbbf24; border-left: 3px solid #fbbf24; }
+        .loading { background: #2a2a3a; color: #93c5fd; border-left: 3px solid #93c5fd; }
+        .data { 
+            background: #0a0e27;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 11px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+        .btn {
+            background: #ffd700;
+            color: #0a0e27;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 8px;
+            width: 100%;
+        }
+        .btn:hover { background: #ffed4e; }
+        .summary {
+            background: #1a1f3a;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .summary h2 { color: #ffd700; margin-bottom: 15px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .stat {
+            background: #0a0e27;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value { font-size: 24px; font-weight: bold; color: #ffd700; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 5px; }
+        .timestamp { color: #666; font-size: 11px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 FundaScope - API Test Panel</h1>
+        
+        <div class="summary" id="summary">
+            <h2>📊 Summary</h2>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="ok-count">0</div>
+                    <div class="stat-label">✅ OK</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="warn-count">0</div>
+                    <div class="stat-label">⚠️ Warning</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="error-count">0</div>
+                    <div class="stat-label">❌ Error</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="total-count">0</div>
+                    <div class="stat-label">📋 Total</div>
+                </div>
+            </div>
+            <div class="timestamp" id="timestamp"></div>
+        </div>
+
+        <div class="grid" id="api-grid"></div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn" style="background: #4ade80; color: #0a0e27; max-width: 200px; margin: 0 auto;" onclick="location.reload()">↻ Recharger Tests</button>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════
+        // API TESTS
+        // ═══════════════════════════════════════
+
+        const tests = [
+            {
+                name: 'CoinGecko API',
+                url: 'https://api.coingecko.com/api/v3/coins/bitcoin?vs_currencies=usd&market_data=true',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: data.id === 'bitcoin',
+                        data: `BTC: $${data.market_data.current_price.usd.toLocaleString()}`
+                    };
+                },
+                free: true,
+                limit: '30 req/min'
+            },
+            {
+                name: 'FRED API',
+                url: 'https://api.stlouisfed.org/fred/series/GDP?api_key=f5a26b2a89e86a3f79bb671a7f6f63d9&file_type=json',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: data.seriess && data.seriess.length > 0,
+                        data: `GDP Series (ID: ${data.seriess[0].id})`
+                    };
+                },
+                free: true,
+                limit: 'Illimité'
+            },
+            {
+                name: 'NewsAPI',
+                url: 'https://newsapi.org/v2/everything?q=bitcoin&sortBy=publishedAt&pageSize=1&apiKey=demo',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: data.articles && data.articles.length > 0,
+                        data: `${data.totalResults} articles trouvés`,
+                        warning: 'Demo key avec limite 100/jour'
+                    };
+                },
+                free: true,
+                limit: '100/jour'
+            },
+            {
+                name: 'FCS Calendar API',
+                url: 'https://api.foreconomiccalendar.com/events?ISO=USD&page=1',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: data.events || data.length > 0,
+                        data: `${(data.events || data).length || 0} événements USD`
+                    };
+                },
+                free: true,
+                limit: '500/mois'
+            },
+            {
+                name: 'Polygon.io (Stocks)',
+                url: 'https://api.polygon.io/v1/meta/symbols?limit=1&apiKey=test',
+                test: async (r) => {
+                    return {
+                        ok: r.status === 200 || r.status === 401, // 401 = API key required but API exists
+                        data: r.status === 401 ? 'API nécessite clé' : 'OK',
+                        warning: 'Nécessite API key gratuit'
+                    };
+                },
+                free: true,
+                limit: 'Illimité (avec clé)'
+            },
+            {
+                name: 'Finnhub API',
+                url: 'https://finnhub.io/api/v1/quote?symbol=AAPL&token=demo',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: data.c !== undefined,
+                        data: data.c ? `AAPL: $${data.c}` : 'Demo limitée',
+                        warning: data.c ? '' : 'Demo key limitée'
+                    };
+                },
+                free: true,
+                limit: 'Illimité (avec clé)'
+            },
+            {
+                name: 'Yahoo Finance (via rapidapi)',
+                url: 'https://yahoo-finance15.p.rapidapi.com/api/v1/markets/quotes?ticker=AAPL&type=EQUITY',
+                test: async (r) => {
+                    return {
+                        ok: r.status === 200 || r.status === 401,
+                        data: r.status === 401 ? 'RapidAPI key needed' : 'OK',
+                        warning: 'Nécessite compte RapidAPI'
+                    };
+                },
+                free: false,
+                limit: 'Freemium'
+            },
+            {
+                name: 'CORS Proxy (corsproxy.io)',
+                url: 'https://corsproxy.io/?https://api.coingecko.com/api/v3/ping',
+                test: async (r) => {
+                    const data = await r.json();
+                    return {
+                        ok: r.ok && (data.gecko_says || data),
+                        data: 'CORS proxy fonctionnel'
+                    };
+                },
+                free: true,
+                limit: 'Illimité'
+            }
+        ];
+
+        // ═══════════════════════════════════════
+        // TEST RUNNER
+        // ═══════════════════════════════════════
+
+        async function runTests() {
+            const grid = document.getElementById('api-grid');
+            grid.innerHTML = '';
+            
+            const results = {
+                ok: 0,
+                warning: 0,
+                error: 0
+            };
+
+            for (const test of tests) {
+                const card = createCard(test);
+                grid.appendChild(card);
+
+                try {
+                    const response = await fetch(test.url, {
+                        signal: AbortSignal.timeout(8000)
+                    });
+                    
+                    const result = await test.test(response);
+                    
+                    const statusEl = card.querySelector('.status');
+                    const dataEl = card.querySelector('.data');
+                    
+                    if (result.ok) {
+                        statusEl.innerHTML = '✅ OK';
+                        statusEl.className = 'status ok';
+                        results.ok++;
+                    } else if (result.warning) {
+                        statusEl.innerHTML = '⚠️ ' + result.warning;
+                        statusEl.className = 'status warning';
+                        results.warning++;
+                    } else {
+                        statusEl.innerHTML = '❌ FAILED';
+                        statusEl.className = 'status error';
+                        results.error++;
+                    }
+                    
+                    if (result.data) {
+                        dataEl.textContent = result.data;
+                    }
+                } catch (e) {
+                    const statusEl = card.querySelector('.status');
+                    statusEl.innerHTML = '❌ ' + e.message;
+                    statusEl.className = 'status error';
+                    results.error++;
+                }
+            }
+
+            // Update summary
+            document.getElementById('ok-count').textContent = results.ok;
+            document.getElementById('warn-count').textContent = results.warning;
+            document.getElementById('error-count').textContent = results.error;
+            document.getElementById('total-count').textContent = tests.length;
+            document.getElementById('timestamp').textContent = `Testé à ${new Date().toLocaleTimeString('fr-FR')}`;
+        }
+
+        function createCard(test) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${test.name}</h3>
+                <div style="font-size: 11px; color: #888; margin-bottom: 8px;">
+                    📍 ${test.limit} ${test.free ? '💰 Gratuit' : '💳 Payant'}
+                </div>
+                <div class="status loading">⏳ Testing...</div>
+                <div class="data">Vérification en cours...</div>
+                <button class="btn" style="font-size: 10px; padding: 6px;" onclick="console.log('${test.name}:', '${test.url}')">📋 URL</button>
+            `;
+            return card;
+        }
+
+        // Run tests on load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

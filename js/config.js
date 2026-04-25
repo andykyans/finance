@@ -9,7 +9,9 @@ const API_CONFIG = {
     requiresAuth: false,
     status: 'pending',
     lastCheck: null,
-    endpoint: 'https://api.coingecko.com/api/v3'
+    endpoint: 'https://api.coingecko.com/api/v3',
+    limit: '30 req/min',
+    type: 'Crypto'
   },
   
   // FRED (Economic data - public API with key)
@@ -19,7 +21,56 @@ const API_CONFIG = {
     key: 'f5a26b2a89e86a3f79bb671a7f6f63d9',
     status: 'pending',
     lastCheck: null,
-    endpoint: 'https://api.stlouisfed.org/fred'
+    endpoint: 'https://api.stlouisfed.org/fred',
+    limit: 'Illimité',
+    type: 'Macro'
+  },
+  
+  // NewsAPI.org (requires free API key)
+  newsapi: {
+    name: 'NewsAPI.org',
+    requiresAuth: true,
+    key: null, // Get free key from https://newsapi.org
+    status: 'pending',
+    lastCheck: null,
+    endpoint: 'https://newsapi.org/v2',
+    limit: '100/jour (free)',
+    type: 'News'
+  },
+  
+  // FCS Economic Calendar
+  fcscalendar: {
+    name: 'FCS Economic Calendar',
+    requiresAuth: false,
+    status: 'pending',
+    lastCheck: null,
+    endpoint: 'https://api.foreconomiccalendar.com',
+    limit: '500/mois',
+    type: 'Calendar'
+  },
+  
+  // Finnhub (requires free API key)
+  finnhub: {
+    name: 'Finnhub (Stocks)',
+    requiresAuth: true,
+    key: null, // Get free key from https://finnhub.io
+    status: 'pending',
+    lastCheck: null,
+    endpoint: 'https://finnhub.io/api/v1',
+    limit: 'Illimité',
+    type: 'Stocks'
+  },
+  
+  // Polygon.io (requires free API key)
+  polygon: {
+    name: 'Polygon.io (Stocks)',
+    requiresAuth: true,
+    key: null, // Get free key from https://polygon.io
+    status: 'pending',
+    lastCheck: null,
+    endpoint: 'https://api.polygon.io/v1',
+    limit: 'Illimité',
+    type: 'Stocks'
   },
   
   // Claude AI (requires API key - WARNING: not included for security)
@@ -30,6 +81,8 @@ const API_CONFIG = {
     status: 'pending',
     lastCheck: null,
     endpoint: 'https://api.anthropic.com/v1',
+    limit: '5M tokens/mois',
+    type: 'AI',
     warning: 'API key required - remove or set via environment'
   }
 };
@@ -63,6 +116,37 @@ async function testAPIs(){
     API_CONFIG.fred.status = 'error';
     API_CONFIG.fred.lastCheck = new Date();
     console.error('❌ FRED API failed:', e.message);
+  }
+  
+  // Test FCS Calendar (no auth needed)
+  try{
+    const res = await fetchWithProxy('https://api.foreconomiccalendar.com/events?ISO=USD&page=1');
+    const data = await res.json();
+    API_CONFIG.fcscalendar.status = (data.events || data.length > 0) ? 'ok' : 'error';
+    API_CONFIG.fcscalendar.lastCheck = new Date();
+    console.log('✅ FCS Calendar:', API_CONFIG.fcscalendar.status);
+  }catch(e){
+    API_CONFIG.fcscalendar.status = 'error';
+    API_CONFIG.fcscalendar.lastCheck = new Date();
+    console.warn('⚠️  FCS Calendar failed:', e.message);
+  }
+  
+  // NewsAPI status
+  if(!API_CONFIG.newsapi.key){
+    API_CONFIG.newsapi.status = 'disabled';
+    console.warn('⚠️  NewsAPI: DISABLED (no API key)');
+  }
+  
+  // Finnhub status  
+  if(!API_CONFIG.finnhub.key){
+    API_CONFIG.finnhub.status = 'disabled';
+    console.warn('⚠️  Finnhub: DISABLED (no API key)');
+  }
+  
+  // Polygon status
+  if(!API_CONFIG.polygon.key){
+    API_CONFIG.polygon.status = 'disabled';
+    console.warn('⚠️  Polygon: DISABLED (no API key)');
   }
   
   // Claude AI status (always pending since no key)
