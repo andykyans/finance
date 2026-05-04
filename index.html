@@ -32,20 +32,46 @@
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="logo">FS</div>
-  <div class="tickers" id="ticker-bar">
-    <div class="tick"><span class="tick-s">SPX</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
-    <div class="tick"><span class="tick-s">BTC</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
-    <div class="tick"><span class="tick-s">ETH</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
-    <div class="tick"><span class="tick-s">GOLD</span><span class="tick-v skel" style="width:40px;height:14px"> </span><span class="tick-c"> </span></div>
+  <div class="logo">FundaScope</div>
+  <div class="topbar-links">
+    <a href="#p-dashboard">Dashboard</a>
+    <a href="#p-crypto">Crypto</a>
+    <a href="#p-assets">Actifs</a>
+    <a href="#p-scoring">IA</a>
   </div>
-  <button class="ia-btn" onclick="aiDash()">⚡ IA</button>
+  <button class="ia-btn" onclick="aiDash()">Essayer</button>
 </div>
 
 <!-- SCROLL AREA -->
 <div class="scroll">
 
 <!-- DASHBOARD -->
+<section class="landing-hero">
+  <div class="landing-hero-copy">
+    <div class="hero-eyebrow">FundaScope Live</div>
+    <h1 class="hero-title">Analyse macro, crypto et IA optimisée.</h1>
+    <p class="hero-subtitle">Une landing page claire et premium pour explorer les indicateurs en temps réel, suivre les tendances et prendre de meilleures décisions plus vite.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="go('dashboard')">Accéder au dashboard</button>
+      <button class="btn btn-secondary" onclick="go('crypto')">Voir les crypto</button>
+    </div>
+  </div>
+  <div class="landing-stats">
+    <div class="stat-card"><span class="stat-label">Live</span><strong>Flux de marché</strong><p>Crypto, macro et données économiques mises à jour en continu.</p></div>
+    <div class="stat-card"><span class="stat-label">Analyse</span><strong>Scores IA</strong><p>Signaux intelligents pour identifier les opportunités rapidement.</p></div>
+    <div class="stat-card"><span class="stat-label">Premium</span><strong>Design moderne</strong><p>Interface élégante, sombre et professionnelle, pensée pour les investisseurs.</p></div>
+    <div class="stat-card"><span class="stat-label">Rapide</span><strong>Navigation fluide</strong><p>Expérience utilisateur réactive sur mobile et desktop.</p></div>
+  </div>
+</section>
+<section class="section">
+  <div class="section-title">Pourquoi choisir FundaScope ?</div>
+  <div class="section-subtitle">Un tableau de bord tout-en-un pour les analystes et traders qui veulent la synthèse macro et crypto dans une seule interface haut de gamme.</div>
+  <div class="feature-grid">
+    <div class="feature-card"><h3>Visualisation claire</h3><p>Des cartes, graphiques et indicateurs positionnés pour un suivi rapide et une lecture instantanée.</p></div>
+    <div class="feature-card"><h3>Contenu intelligent</h3><p>Un score fondamental, un calendrier économique et un rapport COT pour une vue complète du marché.</p></div>
+    <div class="feature-card"><h3>IA intégrée</h3><p>Posez des questions, obtenez des synthèses et analysez le marché directement depuis l’interface.</p></div>
+  </div>
+</section>
 <div class="page active" id="p-dashboard">
   <div class="sh">Dashboard Macro</div>
   <div class="ss"><span class="live-dot"></span> DONNÉES EN TEMPS RÉEL · <span id="last-update">Chargement…</span></div>
